@@ -1,0 +1,41 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      QUIZ_DATABASE_URL: postgresql+asyncpg://postgres:postgres@postgres:5432/qrcard_quizzes
+    ports:
+      - "${QUIZ_API_HOST:-0.0.0.0}:${QUIZ_API_PORT:-8002}:8002"
+    depends_on:
+      - postgres
+
+  migrate:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    profiles:
+      - tools
+    command: alembic upgrade head
+    env_file:
+      - .env
+    environment:
+      QUIZ_DATABASE_URL: postgresql+asyncpg://postgres:postgres@postgres:5432/qrcard_quizzes
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: qrcard_quizzes
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

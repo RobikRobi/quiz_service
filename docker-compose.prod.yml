@@ -1,0 +1,19 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: qrcard-quiz-service:latest
+    restart: unless-stopped
+    env_file:
+      - .env.prod
+    ports:
+      - "${QUIZ_API_HOST:-0.0.0.0}:${QUIZ_API_PORT:-8002}:8002"
+
+  migrate:
+    image: qrcard-quiz-service:latest
+    profiles:
+      - tools
+    command: alembic upgrade head
+    env_file:
+      - .env.prod
