@@ -1,0 +1,51 @@
+Metadata-Version: 2.4
+Name: quiz-service
+Version: 0.1.0
+Summary: Quiz microservice for QRCard
+Requires-Python: >=3.12
+Description-Content-Type: text/markdown
+Requires-Dist: alembic>=1.17.2
+Requires-Dist: asyncpg>=0.31.0
+Requires-Dist: fastapi>=0.137.1
+Requires-Dist: pydantic-settings>=2.14.1
+Requires-Dist: sqlalchemy>=2.0.51
+Requires-Dist: uvicorn>=0.49.0
+
+# quiz_service
+
+Standalone FastAPI service for quizzes.
+
+## Local Docker
+
+```bash
+cp .env.example .env
+docker compose build
+docker compose run --rm migrate
+docker compose up -d api
+```
+
+API docs:
+
+```text
+http://localhost:8002/docs
+```
+
+## Auth Boundary
+
+The service is intentionally independent from `user_service`. Endpoints that need a user id read it from:
+
+```http
+X-User-Id: <uuid>
+```
+
+Later, the gateway or frontend can pass this value after validating the user token.
+
+## Production
+
+Set `QUIZ_DATABASE_URL` in `.env.prod`, then run:
+
+```bash
+docker compose -f docker-compose.prod.yml build
+docker compose -f docker-compose.prod.yml run --rm migrate
+docker compose -f docker-compose.prod.yml up -d api
+```
