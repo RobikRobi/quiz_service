@@ -29,7 +29,6 @@ def get_database_url_and_connect_args() -> tuple[str, dict]:
     sslmode = query.pop("sslmode", None)
     sslrootcert = query.pop("sslrootcert", None)
     query.pop("channel_binding", None)
-    query.setdefault("prepared_statement_cache_size", "0")
 
     connect_args = {}
     if sslmode and sslmode != "disable":
@@ -44,7 +43,8 @@ def get_database_url_and_connect_args() -> tuple[str, dict]:
             ssl_context = ssl.create_default_context(cafile=sslrootcert)
         connect_args["ssl"] = ssl_context
 
-    return str(url.set(query=query)), connect_args
+    database_url = url.set(query=query).render_as_string(hide_password=False)
+    return database_url, connect_args
 
 
 def get_database_url() -> str:

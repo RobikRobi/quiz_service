@@ -27,7 +27,6 @@ query = dict(url.query)
 sslmode = query.pop("sslmode", None)
 sslrootcert = query.pop("sslrootcert", None)
 query.pop("channel_binding", None)
-query.setdefault("prepared_statement_cache_size", "0")
 
 if sslmode and sslmode != "disable":
     if sslmode == "require":

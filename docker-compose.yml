@@ -11,7 +11,8 @@ services:
     ports:
       - "${QUIZ_API_HOST:-0.0.0.0}:${QUIZ_API_PORT:-8002}:8002"
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
 
   migrate:
     build:
@@ -25,7 +26,8 @@ services:
     environment:
       QUIZ_DATABASE_URL: postgresql+asyncpg://postgres:postgres@postgres:5432/qrcard_quizzes
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
 
   postgres:
     image: postgres:16-alpine
@@ -36,6 +38,11 @@ services:
       POSTGRES_PASSWORD: postgres
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d qrcard_quizzes"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
 volumes:
   postgres_data:
